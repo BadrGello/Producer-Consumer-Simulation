@@ -1,8 +1,11 @@
 package com.team.Producer.Consumer.Simulation;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 import java.util.concurrent.ThreadLocalRandom;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 
@@ -10,7 +13,7 @@ public class Machine {
     private  String name;
     private Vector<String> prev;
     private String next;
-    private long serviceTime;
+    private int serviceTime;
     private Product product;
     private String color;
     private  boolean isBusy = false;
@@ -22,7 +25,7 @@ public class Machine {
     public Machine(String name) {
         this.monitor = Monitor.getInstance();
         this.name = name;
-        this.serviceTime = ThreadLocalRandom.current().nextLong(5000, 25000);
+        this.serviceTime = ThreadLocalRandom.current().nextInt(5000, 10000);
         this.isBusy = false;
         monitor.addObserver(this.name, new Observer(this.name));
     }
@@ -38,12 +41,17 @@ public class Machine {
                         monitor.notify(this.name, network);
                         object.wait();
                     }
-                    this.setProduct(prevQueue.dequeue(network)); 
-                    System.out.println(this.getName() +" "+this.product.getColor() + " " + this.serviceTime);
-                    monitor.notify(this.name, network); 
-                    isBusy = true; 
-                    object.wait(); 
-                    object.notifyAll(); 
+                   
+                        this.setProduct(prevQueue.dequeue(network));
+                        System.out.println("Machine added: " + (product != null));  
+                        System.out.println(this.getName() +" "+this.product.getColor() + " " + this.serviceTime);
+                        monitor.notify(this.name, network); 
+                        isBusy = true; 
+                        
+                        object.wait(); 
+                        object.notifyAll(); 
+                        
+                    
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -66,6 +74,7 @@ public class Machine {
                         Thread.sleep(this.serviceTime);
                         nextQueue.enqueue(product, network);
                         System.out.println(nextQueue.getQueueName() + " " + this.product.getColor());
+                        sendUpdate("machine-flash", this.name, this.product.getColor());
                         object.notifyAll();
                         this.setProduct(null); 
                         isBusy = false; 
@@ -80,7 +89,20 @@ public class Machine {
             }
         }
     }
-
+        private void sendUpdate(String type, String machineId, String flashColor) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            String message = mapper.writeValueAsString(Map.of(
+                "type", type,
+                "machineId", machineId,
+                "flashColor", flashColor
+            ));
+            System.out.println("Sending WebSocket message11: " + message); // Add this line
+            Controller.sendMessageToAll(message);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
     
     public void work(Queue prevQueue, Queue nextQueue, network network) {
         
@@ -110,7 +132,7 @@ public class Machine {
         return this.name;
     }
 
-    public long getServiceTime() {
+    public int getServiceTime() {
         return this.serviceTime;
     }
 

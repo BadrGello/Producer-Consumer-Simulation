@@ -1,5 +1,6 @@
 package com.team.Producer.Consumer.Simulation;
 
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -7,9 +8,10 @@ import java.util.Map;
 public class network {
     private boolean onChange = false;
     public boolean stop = false;
-    public boolean inputStop = false;
+
     private static ArrayList<Machine> machines;
     private static ArrayList<Queue> queues;
+  
 
     public void flipChange(){
         this.onChange = !this.onChange;
@@ -71,10 +73,7 @@ public class network {
         this.stop = true;
 
     }
-    public void inputStop(){
-        this.inputStop = true;
-    }
-
+  
     public void clear(){
       
         machines = new ArrayList<>();
@@ -82,13 +81,26 @@ public class network {
     }
 
     public Map<String, Object> getNetwork(){
+        ArrayList<Machine> machiness = this.getMachines();
+        ArrayList<Queue> queuess = this.getQueues(); 
         Map<String, Object> res = new HashMap<>();
-        for(Machine m : machines){
+
+        for(Machine m : machiness){
             res.put(m.getName(), m);
         }
-        for(Queue q: queues){
+        for(Queue q: queuess){
             res.put(q.getQueueName(), q);
         }
         return res;
     }
+
+    public NetworkMemento createMemento(){
+        return new NetworkMemento(this);
+    }
+
+    public void restore(NetworkMemento memento){
+        this.setMachines(memento.getNetwork().getMachines());
+        this.setQueues(memento.getNetwork().getQueues());
+    }
+    
 }

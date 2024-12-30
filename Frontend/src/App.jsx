@@ -115,34 +115,41 @@ const App = () => {
   const [initialState, setInitialState] = useState({ nodes: [], edges: [] });
 
   const serializeGraph = () => {
+    const graph = {};
 
-    const graph = {
-      nodes: nodes.map((node) => ({
-        id: node.id,
-        // type: node.type,
-      })),
-      edges: edges.map((edge) => ({
-        source: edge.source,
-        target: edge.target,
-      })),
-    };
+    nodes.forEach((node) => {
+      const connections = edges
+        .filter((edge) => edge.source === node.id || edge.target === node.id)
+        .map((edge) => (edge.source === node.id ? edge.target : edge.source));
 
-    return graph
+      graph[node.id] = connections;
+    });
 
+    return graph;
   };
 
-  const startSimulation = () => {
-
-    // Save the states for the replay option
+  const startSimulation = async () => {
     setInitialState({ nodes, edges });
 
-    const graph = serializeGraph()
+    const graph = serializeGraph();
 
-    // Send to backend
-    console.log('Serialized Graph:', graph); 
+    console.log('Serialized Graph:', graph);
 
+    try {
+      const response = await fetch('http://localhost:8080/run', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ myNetwork: graph }),
+      });
+
+      const result = await response.text();
+      console.log(result);
+    } catch (error) {
+      console.error('Error starting simulation:', error);
+    }
   };
-
   const replaySimulation = () => {
 
     
@@ -155,7 +162,11 @@ const App = () => {
   };
 
   useEffect(() => {
-    const socket = new WebSocket('ws://localhost:8080');
+    const socket = new WebSocket('ws://localhost:8080/ws');
+
+    socket.onopen = () => {
+      console.log('WebSocket connection established');
+    };
     socket.onmessage = (message) => {
       const data = JSON.parse(message.data);
       console.log("Data Websocket, ", data)
@@ -203,7 +214,13 @@ const App = () => {
         );
       }
     };
+    socket.onerror = (error) => {
+      console.error('WebSocket error:', error);
+    };
 
+    socket.onclose = (event) => {
+      console.log('WebSocket connection closed:', event);
+    };
     return () => socket.close();
   }, []);
   

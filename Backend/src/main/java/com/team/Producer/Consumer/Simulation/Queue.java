@@ -1,6 +1,9 @@
 package com.team.Producer.Consumer.Simulation;
 
 import java.util.ArrayList;
+import java.util.Map;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 public class Queue {
@@ -56,6 +59,7 @@ public class Queue {
             this.products.add(product);
             this.monitor.notify(this.name, network);
             this.notify();
+            sendUpdate("queue-update", this.name, this.products.size());
         }
     }
 
@@ -63,8 +67,22 @@ public class Queue {
         synchronized (this){
             while(this.products.isEmpty()) this.wait();
             this.monitor.notify(this.name, network);
+            sendUpdate("queue-update", this.name, this.products.size()-1);
             return this.products.remove(0);
         }
     }
-
+        private void sendUpdate(String type, String queueId, int count) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            String message = mapper.writeValueAsString(Map.of(
+                "type", type,
+                "queueId", queueId,
+                "count", count
+            ));
+            System.out.println("Sending WebSocket message: " + message); // Add this line
+            Controller.sendMessageToAll(message);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

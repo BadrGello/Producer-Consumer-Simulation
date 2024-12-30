@@ -7,25 +7,27 @@ public class Input {
 
     public void addProduct(Queue queue, network network){
         Runnable input = () -> {
-            int products = ThreadLocalRandom.current().nextInt(5, 10);
+            int products = ThreadLocalRandom.current().nextInt(10, 20);
             System.out.println("Products to be added: " + products);
-            long rate = ThreadLocalRandom.current().nextInt(3000, 10000);
+            long rate = ThreadLocalRandom.current().nextInt(500, 1000);
             System.out.println("input rate: " + rate);
             int check = 0;
             while(!inputThread.isInterrupted()){
                 synchronized (this){
                     try{
-                        if(check > products)
-                            break;                        
-                        queue.getProducts().add(new Product());
+                        if(check >= products)
+                            break;
+                        Product product = new Product();
+                        System.out.println("Product added: " + (product != null));                            
+                        queue.enqueue(product, network);
                         Thread.sleep(rate);
                         check++;
                     }
                     catch (Exception e){
-                        System.out.println();
+                        System.out.println(e);
                     }
                 }
-                if(network.inputStop){
+                if(network.stop){
                     this.inputThread.interrupt();
                 }
             }

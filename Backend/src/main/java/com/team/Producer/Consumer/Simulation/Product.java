@@ -1,7 +1,7 @@
 package com.team.Producer.Consumer.Simulation;
 
 public class Product {
-    private String color = "black";
+    private String color ;
     public Product(){
         this.color = randomColor.generate();
     }
