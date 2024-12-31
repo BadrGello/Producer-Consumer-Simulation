@@ -161,6 +161,15 @@ const App = () => {
 
   };
 
+  const clearAll = () => {
+
+    setEdges([])
+    setNodes([])
+    setQueueCount(0)
+    setMachineCount(0)
+  };
+
+
   useEffect(() => {
     const socket = new WebSocket('ws://localhost:8080/ws');
 
@@ -246,6 +255,7 @@ const App = () => {
           <button className="simulation-button" onClick={startSimulation}>Start Simulation</button>
           <button className="simulation-button" onClick={replaySimulation}>Replay Previous Simulation</button>
 
+          <button onClick={clearAll}>Clear All</button>
           <button onClick={shortcutsDisplay}>Shortcuts</button>
         </Panel>
         <Controls />
