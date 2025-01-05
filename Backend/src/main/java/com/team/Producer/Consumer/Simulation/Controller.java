@@ -47,6 +47,7 @@ public class Controller {
                 m.setPrevQueues(prevQs);
                 System.out.println(m.getNextQueue());
                 machines.add(m);
+                
             } else {
                 Queue q = new Queue(key);
                 queues.add(q);
@@ -69,7 +70,7 @@ public class Controller {
     public String clear(@RequestBody String requestBody)  {
         try {
             Network.stop();
-            Network.clear();
+            Network = new network();
   
             return "clear successfully!";
         } catch (Exception e) {
@@ -80,12 +81,16 @@ public class Controller {
     @PostMapping("/replay")
     public String replay(@RequestBody String requestBody)  {
         try {
-            Network.stop();
-
-            Network = new network();
-            Network = history.getMemento(0).getNetwork();
+        
+            network networky = new network();
+            networky = history.getMemento(0).getNetwork();
+            
+            Controller.Network.setMachines(networky.deepCopyMachines(networky.getMachines()));
+            Controller.Network.setQueues(networky.deepCopyQueues(networky.getQueues())); 
+            Controller.Network.setRate(networky.getRate());
 
             System.out.println("rate: " + Network.getRate());
+            history.addMemento(new NetworkMemento(Network));
             Network.play(); 
             return "replayed successfully!";
         } catch (Exception e) {

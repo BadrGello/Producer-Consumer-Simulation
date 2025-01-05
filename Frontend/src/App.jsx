@@ -276,7 +276,7 @@ const App = () => {
       else if (data.type === 'machine-update') {
         setNodes((nds) =>
           nds.map((node) =>
-            node.id === data.queueId
+            node.id === data.machineId
               ? { ...node, data: { ...node.data, serveTime: data.serveTime } }
               : node
           )

@@ -38,6 +38,8 @@ public class Machine {
         }
         newMachine.next = this.next;
         newMachine.serviceTime = this.serviceTime;
+        newMachine.name = this.name;
+   
         return newMachine;
     }
 
@@ -45,58 +47,62 @@ public class Machine {
 
     
     private void start(Queue prevQueue, network network) {
-        while (!starting.isInterrupted()) {
-            synchronized (object) {
-                try {
-                    while (prevQueue.getProducts().isEmpty()) {
-                        monitor.notify(this.name, network);
-                        object.wait();
-                    }
-                   
-                        this.setProduct(prevQueue.dequeue(network));
-                        System.out.println("Machine added: " + (product != null));  
-                        System.out.println(this.getName() +" "+this.product.getColor() + " " + this.serviceTime);
-                        monitor.notify(this.name, network); 
-                        isBusy = true; 
-                        
-                        object.wait(); 
-                        object.notifyAll(); 
-                        
+        if(!network.stop){
+            while (!starting.isInterrupted()) {
+                synchronized (object) {
+                    try {
+                        while (prevQueue.getProducts().isEmpty()) {
+                            monitor.notify(this.name, network);
+                            object.wait();
+                        }
                     
-                } catch (Exception e) {
-                    e.printStackTrace();
+                            this.setProduct(prevQueue.dequeue(network));
+                            System.out.println("Machine added: " + (product != null));  
+                            System.out.println(this.getName() +" "+this.product.getColor() + " " + this.serviceTime);
+                            monitor.notify(this.name, network); 
+                            isBusy = true; 
+                            
+                            object.wait(); 
+                            object.notifyAll(); 
+                            
+                        
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
-            }
-            if (network.stop) {
-                this.starting.interrupt();
+                if (network.stop) {
+                    this.starting.interrupt();
+                }
             }
         }
     }
     
         
     private void finish(Queue prevQueue, Queue nextQueue, network network) {
-        while (!finishing.isInterrupted()) {
-            synchronized (object) {
-                try {
-                    if (!prevQueue.getProducts().isEmpty() && !isBusy) {
-                        object.notifyAll(); 
+        if(!network.stop){
+            while (!finishing.isInterrupted()) {
+                synchronized (object) {
+                    try {
+                        if (!prevQueue.getProducts().isEmpty() && !isBusy) {
+                            object.notifyAll(); 
+                        }
+                        while (isBusy && product != null) {
+                            Thread.sleep(this.serviceTime);
+                            nextQueue.enqueue(product, network);
+                            System.out.println(nextQueue.getQueueName() + " " + this.product.getColor());
+                            sendUpdate("machine-flash", this.name, this.product.getColor());
+                            object.notifyAll();
+                            this.setProduct(null); 
+                            isBusy = false; 
+                            object.wait(); 
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                    while (isBusy && product != null) {
-                        Thread.sleep(this.serviceTime);
-                        nextQueue.enqueue(product, network);
-                        System.out.println(nextQueue.getQueueName() + " " + this.product.getColor());
-                        sendUpdate("machine-flash", this.name, this.product.getColor());
-                        object.notifyAll();
-                        this.setProduct(null); 
-                        isBusy = false; 
-                        object.wait(); 
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
                 }
-            }
-            if (network.stop) {
-                this.finishing.interrupt();
+                if (network.stop) {
+                    this.finishing.interrupt();
+                }
             }
         }
     }
@@ -108,7 +114,21 @@ public class Machine {
                 "machineId", machineId,
                 "flashColor", flashColor
             ));
-            System.out.println("Sending WebSocket message11: " + message); // Add this line
+            System.out.println("Sending WebSocket message11: " + message); 
+            Controller.sendMessageToAll(message);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    public void sendUpdate(String type, String machineId, float serviceTime) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            String message = mapper.writeValueAsString(Map.of(
+                "type", type,
+                "machineId", machineId,
+                "serveTime", serviceTime
+            ));
+            System.out.println("Sending WebSocket message12: " + message); 
             Controller.sendMessageToAll(message);
         } catch (Exception e) {
             e.printStackTrace();

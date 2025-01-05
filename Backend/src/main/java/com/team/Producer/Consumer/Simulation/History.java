@@ -10,6 +10,7 @@ public class History {
         this.mementos = new ArrayList<>();
     }
     public void addMemento(NetworkMemento memento) {
+        this.mementos.clear();
         this.mementos.add(memento);
     }
 

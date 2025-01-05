@@ -38,21 +38,20 @@ public class network {
     }
 
     public network(){
-        machines = new ArrayList<>();
-        queues = new ArrayList<>();
-        this.rate = ThreadLocalRandom.current().nextInt(5000, 10000);
+        this.stop = false;
+        this.machines = new ArrayList<>();
+        this.queues = new ArrayList<>();
+        this.rate = ThreadLocalRandom.current().nextLong(5000, 10000);
     }
 
     public void play(){
         this.stop = false;
-
-
         try {
            
-
             Input inputThread = new Input(this.rate);
             inputThread.addProduct(this.queues.get(0), this);
             for(Machine m:this.machines) {
+                m.sendUpdate("machine-update", m.getName(), ((float) m.getServiceTime()/1000));
                 int indexInQueues1 = Integer.parseInt(m.getNextQueue().replaceAll("[^0-9]", ""));
                 Queue q1 = this.queues.get(indexInQueues1);
                 for (String prevQueue: m.getPrevQueues()){

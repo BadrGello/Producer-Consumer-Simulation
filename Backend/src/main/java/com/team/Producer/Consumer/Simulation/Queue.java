@@ -7,10 +7,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 public class Queue {
-    String name;
+    private String name;
     private ArrayList<Product> products;
     private Monitor monitor;
-    int size;
+    private int size;
 
     public Queue(String name){
         this.products = new ArrayList<>();
@@ -55,21 +55,27 @@ public class Queue {
     }
 
     public synchronized void enqueue(Product product, network network) throws Exception{
-        synchronized (this){
-            this.products.add(product);
-            this.monitor.notify(this.name, network);
-            this.notify();
-            sendUpdate("queue-update", this.name, this.products.size());
+        if(!network.stop){
+            synchronized (this){
+                this.products.add(product);
+                this.monitor.notify(this.name, network);
+                this.notify();
+                sendUpdate("queue-update", this.name, this.products.size());
+            }
         }
     }
 
     public Product dequeue(network network) throws Exception{
-        synchronized (this){
-            while(this.products.isEmpty()) this.wait();
-            this.monitor.notify(this.name, network);
-            sendUpdate("queue-update", this.name, this.products.size()-1);
-            return this.products.remove(0);
+        if(!network.stop){
+            synchronized (this){
+                while(this.products.isEmpty()) this.wait();
+                this.monitor.notify(this.name, network);
+                sendUpdate("queue-update", this.name, this.products.size()-1);
+                return this.products.remove(0);
+            }
         }
+        else 
+            return null;
     }
         private void sendUpdate(String type, String queueId, int count) {
         try {
