@@ -14,9 +14,10 @@ import 'reactflow/dist/style.css';
 const CustomNode = ({ data }) => (
   <div style={customNodeStyles(data)}>
     {/* Handle is the points that connect nodes together */}
+    
     <Handle
-      type="source"
-      position="left"
+      type="target"
+      position="right"
       style={{ background: '#555' }}
     />
 
@@ -37,9 +38,11 @@ const CustomNode = ({ data }) => (
      </div>
     } 
 
+    
+
     <Handle
-      type="target"
-      position="right"
+      type="source"
+      position="left"
       style={{ background: '#555' }}
     />
   </div>
@@ -48,7 +51,7 @@ const CustomNode = ({ data }) => (
 const customNodeStyles = (node) => {
   const nodeType = node.label ? node.label[0] : ''; // nodeType is either M or Q
   const nodeFlash = node.flash ? node.flashColor : '#ddd';
-  console.log(node)
+  // console.log(node)
 
   return {
     background: nodeFlash,
