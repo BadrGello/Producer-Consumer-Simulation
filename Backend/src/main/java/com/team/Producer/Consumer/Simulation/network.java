@@ -2,20 +2,19 @@ package com.team.Producer.Consumer.Simulation;
 
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class network {
     private boolean onChange = false;
     public boolean stop = false;
 
-    private static ArrayList<Machine> machines;
-    private static ArrayList<Queue> queues;
+    private  ArrayList<Machine> machines;
+    private  ArrayList<Queue> queues;
+    private int products;
+    private long rate ;
+            
   
 
-    public void flipChange(){
-        this.onChange = !this.onChange;
-    }
     public void setChange(boolean change){
         this.onChange = change;
     }
@@ -24,24 +23,26 @@ public class network {
     }
 
     public ArrayList<Machine> getMachines() {
-        return machines;
+        return this.machines;
     }
 
     public void setMachines(ArrayList<Machine> machines) {
-        network.machines = machines;
+        this.machines = machines;
     }
 
     public ArrayList<Queue> getQueues() {
-        return queues;
+        return this.queues;
     }
 
     public void setQueues(ArrayList<Queue> newQueues) {
-        queues = newQueues;
+        this.queues = newQueues;
     }
 
     public network(){
         machines = new ArrayList<>();
         queues = new ArrayList<>();
+        this.products = ThreadLocalRandom.current().nextInt(10, 20);
+        this.rate = ThreadLocalRandom.current().nextInt(500, 1000);
     }
 
     public void play(){
@@ -51,14 +52,14 @@ public class network {
         try {
            
 
-            Input inputThread = new Input();
-            inputThread.addProduct(queues.get(0), this);
-            for(Machine m:machines) {
+            Input inputThread = new Input(this.products, this.rate);
+            inputThread.addProduct(this.queues.get(0), this);
+            for(Machine m:this.machines) {
                 int indexInQueues1 = Integer.parseInt(m.getNextQueue().replaceAll("[^0-9]", ""));
-                Queue q1 = queues.get(indexInQueues1);
+                Queue q1 = this.queues.get(indexInQueues1);
                 for (String prevQueue: m.getPrevQueues()){
                         int indexInQueues = Integer.parseInt(prevQueue.replaceAll("[^0-9]", ""));
-                        Queue q = queues.get(indexInQueues);
+                        Queue q = this.queues.get(indexInQueues);
                         m.work(q,q1,this);
                     }
                 }
@@ -76,31 +77,39 @@ public class network {
   
     public void clear(){
       
-        machines = new ArrayList<>();
-        queues = new ArrayList<>();
+        this.machines = new ArrayList<>();
+        this.queues = new ArrayList<>();
+        this.rate = 0;
+        this.products = 0;   
+    }
+    public long getRate(){
+        return this.rate;
     }
 
-    public Map<String, Object> getNetwork(){
-        ArrayList<Machine> machiness = this.getMachines();
-        ArrayList<Queue> queuess = this.getQueues(); 
-        Map<String, Object> res = new HashMap<>();
+    public void setRate(long rate){
+        this.rate = rate;
+    }
 
-        for(Machine m : machiness){
-            res.put(m.getName(), m);
+    public int getProducts(){
+        return this.products;
+    }
+
+    public void setProducts(int products){
+        this.products = products;
+    }
+
+    public ArrayList<Queue> deepCopyQueues(ArrayList<Queue> queues) {
+        ArrayList<Queue> copiedQueues = new ArrayList<>();
+        for (Queue queue : queues) {
+            copiedQueues.add(queue.Clone());
         }
-        for(Queue q: queuess){
-            res.put(q.getQueueName(), q);
-        }
-        return res;
+        return copiedQueues;
     }
-
-    public NetworkMemento createMemento(){
-        return new NetworkMemento(this);
+    public ArrayList<Machine> deepCopyMachines(ArrayList<Machine> machines) {
+        ArrayList<Machine> copiedMachines = new ArrayList<>();
+        for (Machine machine : machines) {
+            copiedMachines.add(machine.Clone());
+       }
+        return copiedMachines;
     }
-
-    public void restore(NetworkMemento memento){
-        this.setMachines(memento.getNetwork().getMachines());
-        this.setQueues(memento.getNetwork().getQueues());
-    }
-    
 }

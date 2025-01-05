@@ -150,23 +150,57 @@ const App = () => {
       console.error('Error starting simulation:', error);
     }
   };
-  const replaySimulation = () => {
+
+  
+  const replaySimulation = async () => {
 
     
     setNodes(initialState.nodes);
     setEdges(initialState.edges);
 
+    try {
+      const response = await fetch('http://localhost:8080/replay', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ }),
+      });
+      const result = await response.text();
+      console.log(result);
+
+    } catch (error) {
+      console.error('Error in replay simulation:', error);
+    }
+
     // Send to backend
-    console.log('Replay Simulation');
+    
 
   };
 
-  const clearAll = () => {
+  
+
+  const clearAll= async () =>  {
 
     setEdges([])
     setNodes([])
     setQueueCount(0)
     setMachineCount(0)
+
+    try {
+      const response = await fetch('http://localhost:8080/clear', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ }),
+      });
+
+      const result = await response.text();
+      console.log(result);
+    } catch (error) {
+      console.error('Error in clear simulation:', error);
+    }
   };
 
 

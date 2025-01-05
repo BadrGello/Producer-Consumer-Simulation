@@ -79,10 +79,11 @@ public class Queue {
                 "queueId", queueId,
                 "count", count
             ));
-            System.out.println("Sending WebSocket message: " + message); // Add this line
+            System.out.println("Sending WebSocket message: " + message); 
             Controller.sendMessageToAll(message);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
 }

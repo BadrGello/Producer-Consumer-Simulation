@@ -22,14 +22,15 @@ import org.springframework.context.annotation.Configuration;
 @CrossOrigin(origins = "http://localhost:5173")
 @RequestMapping(path = "")
 public class Controller {
-    public ArrayList<Machine> machines = new ArrayList<>();
-    public ArrayList<Queue> queues = new ArrayList<>();
-    public network Network;
-    public History history = new History();
-    private static final CopyOnWriteArrayList<WebSocketSession> sessions = new CopyOnWriteArrayList<>();
+    
+    public static network Network;
+    public static History history = new History();
+    public static final CopyOnWriteArrayList<WebSocketSession> sessions = new CopyOnWriteArrayList<>();
 
     @PostMapping("/run")
     public String run(@RequestBody Map<String, Object> requestBody) {
+        ArrayList<Machine> machines = new ArrayList<>();
+        ArrayList<Queue> queues = new ArrayList<>();
         Map<String, ArrayList<String>> myNetwork = (Map<String, ArrayList<String>>) requestBody.get("myNetwork");
         if (myNetwork.isEmpty()) {
             System.out.println("empty network!");
@@ -54,6 +55,7 @@ public class Controller {
         Network = new network();
         Network.setMachines(machines);
         Network.setQueues(queues);
+        history.addMemento(new NetworkMemento(Network));
 
         try {
             Network.play();
@@ -63,6 +65,35 @@ public class Controller {
             return "error in run!";
         }
     }
+    @PostMapping("/clear")
+    public String clear(@RequestBody String requestBody)  {
+        try {
+            Network.stop();
+            Network.clear();
+  
+            return "clear successfully!";
+        } catch (Exception e) {
+            System.out.println("Error in clear!");
+            return "error in clear!";       
+        }
+    }   
+    @PostMapping("/replay")
+    public String replay(@RequestBody String requestBody)  {
+        try {
+            Network.stop();
+
+            network newNetwork = new network();
+            newNetwork = history.getMemento(0).getNetwork();
+
+            System.out.println("rate: " + newNetwork.getRate());
+            System.out.println("products: " + newNetwork.getProducts());
+            newNetwork.play(); 
+            return "replayed successfully!";
+        } catch (Exception e) {
+            System.out.println("Error in replay!");
+            return "error in replay!";       
+        }
+    }  
 
     public static void sendMessageToAll(String message) {
         for (WebSocketSession session : sessions) {
@@ -73,6 +104,9 @@ public class Controller {
             }
         }
     }
+
+
+    
 
     @Configuration
     @EnableWebSocket

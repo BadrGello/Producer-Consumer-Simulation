@@ -1,16 +1,22 @@
 package com.team.Producer.Consumer.Simulation;
 
-import java.util.concurrent.ThreadLocalRandom;
+
 
 public class Input {
- private Thread inputThread;
+    private Thread inputThread;
+    private int products;
+    private long rate;
+
+    public Input( int products, long rate) {      
+        this.products = products;
+        this.rate = rate;
+    }
+
 
     public void addProduct(Queue queue, network network){
         Runnable input = () -> {
-            int products = ThreadLocalRandom.current().nextInt(10, 20);
-            System.out.println("Products to be added: " + products);
-            long rate = ThreadLocalRandom.current().nextInt(500, 1000);
-            System.out.println("input rate: " + rate);
+            System.out.println("rate: " + this.rate);    
+            System.out.println("products: " + this.products);
             int check = 0;
             while(!inputThread.isInterrupted()){
                 synchronized (this){

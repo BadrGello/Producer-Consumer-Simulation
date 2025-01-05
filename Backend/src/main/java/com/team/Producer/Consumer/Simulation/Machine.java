@@ -1,5 +1,6 @@
 package com.team.Producer.Consumer.Simulation;
 
+
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
@@ -15,7 +16,6 @@ public class Machine {
     private String next;
     private int serviceTime;
     private Product product;
-    private String color;
     private  boolean isBusy = false;
     private Monitor monitor; 
     private Thread starting;
@@ -23,11 +23,22 @@ public class Machine {
     private final Object object = new Object();
 
     public Machine(String name) {
+        this.prev = new Vector<String>();
         this.monitor = Monitor.getInstance();
         this.name = name;
         this.serviceTime = ThreadLocalRandom.current().nextInt(5000, 10000);
         this.isBusy = false;
         monitor.addObserver(this.name, new Observer(this.name));
+    }
+
+    public Machine Clone() {
+        Machine newMachine = new Machine(this.name);
+        for(String p : this.prev){
+            newMachine.prev.add(p);
+        }
+        newMachine.next = this.next;
+        newMachine.serviceTime = this.serviceTime;
+        return newMachine;
     }
 
     
@@ -142,8 +153,6 @@ public class Machine {
 
     public void setProduct(Product product) {
         this.product = product;
-        if(product != null)
-            this.color = product.getColor();
     }
 
 
