@@ -82,12 +82,11 @@ public class Controller {
         try {
             Network.stop();
 
-            network newNetwork = new network();
-            newNetwork = history.getMemento(0).getNetwork();
+            Network = new network();
+            Network = history.getMemento(0).getNetwork();
 
-            System.out.println("rate: " + newNetwork.getRate());
-            System.out.println("products: " + newNetwork.getProducts());
-            newNetwork.play(); 
+            System.out.println("rate: " + Network.getRate());
+            Network.play(); 
             return "replayed successfully!";
         } catch (Exception e) {
             System.out.println("Error in replay!");

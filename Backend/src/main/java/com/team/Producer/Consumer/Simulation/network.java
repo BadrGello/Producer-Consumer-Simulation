@@ -10,7 +10,6 @@ public class network {
 
     private  ArrayList<Machine> machines;
     private  ArrayList<Queue> queues;
-    private int products;
     private long rate ;
             
   
@@ -41,8 +40,7 @@ public class network {
     public network(){
         machines = new ArrayList<>();
         queues = new ArrayList<>();
-        this.products = ThreadLocalRandom.current().nextInt(10, 20);
-        this.rate = ThreadLocalRandom.current().nextInt(500, 1000);
+        this.rate = ThreadLocalRandom.current().nextInt(5000, 10000);
     }
 
     public void play(){
@@ -52,7 +50,7 @@ public class network {
         try {
            
 
-            Input inputThread = new Input(this.products, this.rate);
+            Input inputThread = new Input(this.rate);
             inputThread.addProduct(this.queues.get(0), this);
             for(Machine m:this.machines) {
                 int indexInQueues1 = Integer.parseInt(m.getNextQueue().replaceAll("[^0-9]", ""));
@@ -79,8 +77,7 @@ public class network {
       
         this.machines = new ArrayList<>();
         this.queues = new ArrayList<>();
-        this.rate = 0;
-        this.products = 0;   
+        this.rate = 0;   
     }
     public long getRate(){
         return this.rate;
@@ -88,14 +85,6 @@ public class network {
 
     public void setRate(long rate){
         this.rate = rate;
-    }
-
-    public int getProducts(){
-        return this.products;
-    }
-
-    public void setProducts(int products){
-        this.products = products;
     }
 
     public ArrayList<Queue> deepCopyQueues(ArrayList<Queue> queues) {

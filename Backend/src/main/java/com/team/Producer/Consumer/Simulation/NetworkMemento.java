@@ -10,7 +10,6 @@ public class NetworkMemento {
         this.network.setMachines(networky.deepCopyMachines(networky.getMachines()));
         this.network.setQueues(networky.deepCopyQueues(networky.getQueues()));
         System.out.println("gettt "+this.network.getQueues().size());
-        this.network.setProducts(networky.getProducts());
         this.network.setRate(networky.getRate());
 
     }

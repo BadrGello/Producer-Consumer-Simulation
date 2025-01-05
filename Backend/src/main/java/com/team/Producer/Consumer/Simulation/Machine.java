@@ -26,7 +26,7 @@ public class Machine {
         this.prev = new Vector<String>();
         this.monitor = Monitor.getInstance();
         this.name = name;
-        this.serviceTime = ThreadLocalRandom.current().nextInt(5000, 10000);
+        this.serviceTime = ThreadLocalRandom.current().nextInt(5000, 25000);
         this.isBusy = false;
         monitor.addObserver(this.name, new Observer(this.name));
     }
