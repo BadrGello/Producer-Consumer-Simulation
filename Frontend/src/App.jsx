@@ -169,7 +169,7 @@ const App = () => {
 
   
   const replaySimulation = async () => {
-
+    stopSimulation();
     
     setNodes(initialState.nodes);
     setEdges(initialState.edges);
@@ -194,14 +194,7 @@ const App = () => {
 
   };
 
-  
-
-  const clearAll= async () =>  {
-
-    setEdges([])
-    setNodes([])
-    setQueueCount(0)
-    setMachineCount(0)
+  const stopSimulation = async () => {
 
     try {
       const response = await fetch('http://localhost:8080/clear', {
@@ -217,6 +210,17 @@ const App = () => {
     } catch (error) {
       console.error('Error in clear simulation:', error);
     }
+
+  };
+  
+  const clearAll= async () =>  {
+
+    setEdges([])
+    setNodes([])
+    setQueueCount(0)
+    setMachineCount(0)
+
+    stopSimulation()
   };
 
 
@@ -315,7 +319,8 @@ const App = () => {
           <button onClick={addMachine}>Add Machine</button>
           <button className="simulation-button" onClick={startSimulation}>Start Simulation</button>
           <button className="simulation-button" onClick={replaySimulation}>Replay Previous Simulation</button>
-
+          <button className="simulation-button" onClick={stopSimulation}>Stop Simulation</button>
+          
           <button onClick={clearAll}>Clear All</button>
           <button onClick={shortcutsDisplay}>Shortcuts</button>
         </Panel>
