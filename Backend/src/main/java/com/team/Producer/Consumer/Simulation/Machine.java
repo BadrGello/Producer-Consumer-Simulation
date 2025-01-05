@@ -174,6 +174,11 @@ public class Machine {
     public void setProduct(Product product) {
         this.product = product;
     }
-
+    public Thread getStarting() {
+        return this.starting;
+    }
+    public Thread getFinishing() {
+        return this.finishing;
+    }
 
 }

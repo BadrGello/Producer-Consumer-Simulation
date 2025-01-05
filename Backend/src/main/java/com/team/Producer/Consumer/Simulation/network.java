@@ -68,6 +68,9 @@ public class network {
     }
 
     public void stop(){
+        for(Machine m: this.machines){
+            m.getFinishing().interrupt();
+        }
         this.stop = true;
 
     }

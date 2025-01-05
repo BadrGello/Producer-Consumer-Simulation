@@ -14,7 +14,6 @@ public class Input {
     public void addProduct(Queue queue, network network){
         Runnable input = () -> {
             System.out.println("rate: " + this.rate);    
-            int check = 0;
             while(!inputThread.isInterrupted()){
                 synchronized (this){
                     try{
@@ -22,7 +21,6 @@ public class Input {
                         System.out.println("Product added: " + (product != null));                            
                         queue.enqueue(product, network);
                         Thread.sleep(rate);
-                        check++;
                     }
                     catch (Exception e){
                         System.out.println(e);
