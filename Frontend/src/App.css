@@ -32,6 +32,12 @@
   height: 30px;
 }
 
+.panel button:disabled {
+  background-color: #ccc;
+  color: #666;
+  cursor: not-allowed; 
+  opacity: 0.7; 
+}
 .panel .simulation-button {
   background-color: #3e7bb7;
 }
