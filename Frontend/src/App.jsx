@@ -38,7 +38,20 @@ const CustomNode = ({ data }) => (
      </div>
     } 
 
-    
+    {/* Time of service of products for the machines */}
+    {data.serveTime !== undefined && 
+      <div
+        style={{
+          position: 'absolute',
+          top: '-20px', // Position the serveTime above the node
+          left: '50%',
+          transform: 'translateX(-50%)',
+          fontSize: '12px', // Adjust font size
+        }}
+      >
+        Time: {data.serveTime}
+     </div>
+    } 
 
     <Handle
       type="source"
@@ -107,7 +120,7 @@ const App = () => {
       {
         id: `M${machineCount}`,
         type: 'customNode',
-        data: { label: `M${machineCount}`, flashColor: '#ddd', flash: false }, // To test flash, set flash to true and flashColor to some color
+        data: { label: `M${machineCount}`, serveTime: 0, flashColor: '#ddd', flash: false }, // To test flash, set flash to true and flashColor to some color
         position: { x: Math.random() * 400, y: Math.random() * 400 },
       },
     ]);
@@ -259,6 +272,17 @@ const App = () => {
           )
         );
       }
+
+      else if (data.type === 'machine-update') {
+        setNodes((nds) =>
+          nds.map((node) =>
+            node.id === data.queueId
+              ? { ...node, data: { ...node.data, serveTime: data.serveTime } }
+              : node
+          )
+        );
+      }
+      
     };
     socket.onerror = (error) => {
       console.error('WebSocket error:', error);
