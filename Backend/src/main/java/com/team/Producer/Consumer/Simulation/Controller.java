@@ -56,7 +56,10 @@ public class Controller {
         Network = new network();
         Network.setMachines(machines);
         Network.setQueues(queues);
-        history.addMemento(new NetworkMemento(Network));
+        for(Machine m: Network.getMachines()){
+            System.out.println("m: " + m.getServiceTime());
+            m.sendUpdate("machine-update", m.getName(), ((float) m.getServiceTime()/1000));
+        }
 
         try {
             Network.play();
@@ -69,6 +72,7 @@ public class Controller {
     @PostMapping("/clear")
     public String clear(@RequestBody String requestBody)  {
         try {
+            history.addMemento(new NetworkMemento(Network));
             Network.stop();
             Network = new network();
   
@@ -86,11 +90,20 @@ public class Controller {
             networky = history.getMemento(0).getNetwork();
             
             Controller.Network.setMachines(networky.deepCopyMachines(networky.getMachines()));
-            Controller.Network.setQueues(networky.deepCopyQueues(networky.getQueues())); 
+            Controller.Network.setQueues(networky.deepCopyQueues(networky.getQueues()));
+            System.out.println("sizeQ: " + networky.getQueues().size());
+            Controller.Network.setProducts(networky.deepCopyProducts(networky.getProducts()));
+            System.out.println("sizeP: " + networky.getProducts().size());
+            Controller.Network.replayed = true; 
             Controller.Network.setRate(networky.getRate());
 
+            for(Machine m: Network.getMachines()){
+                System.out.println("m: " + m.getServiceTime());
+                m.sendUpdate("machine-update", m.getName(), ((float) m.getServiceTime()/1000));
+            }
+
             System.out.println("rate: " + Network.getRate());
-            history.addMemento(new NetworkMemento(Network));
+            //history.addMemento(new NetworkMemento(Network));
             Network.play(); 
             return "replayed successfully!";
         } catch (Exception e) {
