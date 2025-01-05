@@ -92,6 +92,13 @@ const App = () => {
   const [queueCount, setQueueCount] = useState(0);
   const [machineCount, setMachineCount] = useState(0);
 
+  const [isDisabled, setIsDisabled] = useState(false); // Manage buttons status
+  const [locked, setLocked] = useState(false); // Manage lock status of the Controls
+
+  const handleInteractiveChange = (interactive) => {
+    setLocked(!interactive);
+  };
+
   const shortcutsDisplay = () => {
     alert("Select a node/edge and click \"Backspace\" to delete.\nTo select multiple objects: \"Shift\" + drag")
   };
@@ -165,11 +172,14 @@ const App = () => {
     } catch (error) {
       console.error('Error starting simulation:', error);
     }
+
+    setIsDisabled(true);
+    setLocked(true)
   };
 
   
   const replaySimulation = async () => {
-
+    stopSimulation();
     
     setNodes(initialState.nodes);
     setEdges(initialState.edges);
@@ -191,17 +201,11 @@ const App = () => {
 
     // Send to backend
     
-
+    setIsDisabled(true);
+    setLocked(true)
   };
 
-  
-
-  const clearAll= async () =>  {
-
-    setEdges([])
-    setNodes([])
-    setQueueCount(0)
-    setMachineCount(0)
+  const stopSimulation = async () => {
 
     try {
       const response = await fetch('http://localhost:8080/clear', {
@@ -217,6 +221,22 @@ const App = () => {
     } catch (error) {
       console.error('Error in clear simulation:', error);
     }
+
+    setIsDisabled(false);
+    setLocked(false)
+  };
+  
+  const clearAll= async () =>  {
+
+    setEdges([])
+    setNodes([])
+    setQueueCount(0)
+    setMachineCount(0)
+
+    stopSimulation()
+
+    setIsDisabled(false);
+    setLocked(false)
   };
 
 
@@ -306,20 +326,32 @@ const App = () => {
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
         fitView
+
+        // The following to handle toggle of Lock of the interactivity (shouldn't be able to move or interact with the nodes if a simulation is playing)
+        interactionMode={locked ? 'none' : 'zoom'} // Lock/Unlock based on state
+        nodesDraggable={!locked}
+        nodesConnectable={!locked}
+        elementsSelectable={!locked}
       >
         <Background />
         <Panel className="panel">
           <div>Toolbar:</div>
 
-          <button onClick={addQueue}>Add Queue</button>
-          <button onClick={addMachine}>Add Machine</button>
-          <button className="simulation-button" onClick={startSimulation}>Start Simulation</button>
-          <button className="simulation-button" onClick={replaySimulation}>Replay Previous Simulation</button>
-
+          <button onClick={addQueue} disabled={isDisabled}>Add Queue</button>
+          <button onClick={addMachine} disabled={isDisabled}>Add Machine</button>
+          <button className="simulation-button" onClick={startSimulation} disabled={isDisabled}>Start Simulation</button>
+          <button className="simulation-button" onClick={replaySimulation} disabled={isDisabled}>Replay Previous Simulation</button>
+          <button className="simulation-button" onClick={stopSimulation}>Stop Simulation</button>
+          
           <button onClick={clearAll}>Clear All</button>
           <button onClick={shortcutsDisplay}>Shortcuts</button>
         </Panel>
-        <Controls />
+        <Controls 
+        
+          showInteractive={true} 
+          onInteractiveChange={(interactive) => handleInteractiveChange(interactive)}
+
+        />
         <MiniMap />
       </ReactFlow>
     </div>
