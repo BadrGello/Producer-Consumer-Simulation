@@ -47,20 +47,18 @@ public class Machine {
 
     
     private void start(Queue prevQueue, network network) {
-            System.out.println("Machine started: " + this.name);
+
             while (!starting.isInterrupted()) {
                 synchronized (object) {
-                    System.out.println("Machine working: " + this.name);
+                
                     try {
-                        System.out.println("prev : " + prevQueue.getQueueName());
+                 
                         while (prevQueue.getProducts().isEmpty()) {
                             monitor.notify(this.name, network);
                             object.wait();
                         }
-                           System.out.println("Machine also working: " + this.name);
+     
                             this.setProduct(prevQueue.dequeue(network));
-                            System.out.println("Machine added: " + (product != null));  
-                            System.out.println(this.getName() +" "+this.product.getColor() + " " + this.serviceTime);
                             monitor.notify(this.name, network); 
                             isBusy = true; 
                             
@@ -91,7 +89,7 @@ public class Machine {
                         while (isBusy && product != null) {
                             Thread.sleep(this.serviceTime);
                             nextQueue.enqueue(product, network);
-                            System.out.println(nextQueue.getQueueName() + " " + this.product.getColor());
+                       
                             sendUpdate("machine-flash", this.name, this.product.getColor());
                             object.notifyAll();
                             this.setProduct(null); 
@@ -108,7 +106,7 @@ public class Machine {
             }
         
     }
-        private void sendUpdate(String type, String machineId, String flashColor) {
+        private synchronized void sendUpdate(String type, String machineId, String flashColor) {
         try {
             ObjectMapper mapper = new ObjectMapper();
             String message = mapper.writeValueAsString(Map.of(
@@ -122,7 +120,7 @@ public class Machine {
             e.printStackTrace();
         }
     }
-    public void sendUpdate(String type, String machineId, float serviceTime) {
+    public  synchronized void sendUpdate(String type, String machineId, float serviceTime) {
         try {
             ObjectMapper mapper = new ObjectMapper();
             String message = mapper.writeValueAsString(Map.of(
@@ -137,7 +135,7 @@ public class Machine {
         }
     }
     
-    public void work(Queue prevQueue, Queue nextQueue, network network) {
+    public  void work(Queue prevQueue, Queue nextQueue, network network) {
         
         this.starting = new Thread(() -> start(prevQueue, network));
         

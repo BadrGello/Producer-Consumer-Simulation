@@ -65,7 +65,7 @@ public class Queue {
         }
     }
 
-    public Product dequeue(network network) throws Exception{
+    public synchronized Product dequeue(network network) throws Exception{
         if(!network.stop){
             synchronized (this){
                 while(this.products.isEmpty()) this.wait();
@@ -77,7 +77,7 @@ public class Queue {
         else 
             return null;
     }
-        private void sendUpdate(String type, String queueId, int count) {
+        private  synchronized void sendUpdate(String type, String queueId, int count) {
         try {
             ObjectMapper mapper = new ObjectMapper();
             String message = mapper.writeValueAsString(Map.of(

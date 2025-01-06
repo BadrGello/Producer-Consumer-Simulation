@@ -130,7 +130,7 @@ public class Controller {
         }
     }  
 
-    public static void sendMessageToAll(String message) {
+    public synchronized static void sendMessageToAll(String message) {
         for (WebSocketSession session : sessions) {
             try {
                 session.sendMessage(new TextMessage(message));
