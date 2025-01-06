@@ -40,6 +40,7 @@ public class network {
     }
 
     public network(){
+        this.stop = false;
         this.replayed = false;
         this.machines = new ArrayList<>();
         this.queues = new ArrayList<>();
@@ -56,10 +57,11 @@ public class network {
             for(Machine m:this.machines) {                
                 int indexInQueues1 = Integer.parseInt(m.getNextQueue().replaceAll("[^0-9]", ""));
                 Queue q1 = this.queues.get(indexInQueues1);
-                
+                System.out.println( m.getName() +"next is :"+ q1.getQueueName());
                 for (String prevQueue: m.getPrevQueues()){
                         int indexInQueues = Integer.parseInt(prevQueue.replaceAll("[^0-9]", ""));
                         Queue q = this.queues.get(indexInQueues);
+                        System.out.println( m.getName() +"prev is :"+ q.getQueueName());
                         m.work(q,q1,this);
                     }
                 }
@@ -71,10 +73,11 @@ public class network {
     }
 
     public void stop(){
+        this.stop = true;
         for(Machine m: this.machines){
             m.getFinishing().interrupt();
         }
-        this.stop = true;
+        
 
     }
   
@@ -82,7 +85,7 @@ public class network {
         this.products = new ArrayList<>();
         this.machines = new ArrayList<>();
         this.queues = new ArrayList<>();
-        this.rate = 0;   
+        this.rate = ThreadLocalRandom.current().nextLong(5000, 10000); 
     }
     public long getRate(){
         return this.rate;

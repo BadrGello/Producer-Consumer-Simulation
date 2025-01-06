@@ -39,7 +39,7 @@ public class Controller {
         for (String key : myNetwork.keySet()) {
             if (key.contains("M")) {
                 Machine m = new Machine(key);
-                m.setNextQueue(myNetwork.get(key).get(myNetwork.get(key).size() - 1));
+                m.setNextQueue(myNetwork.get(key).get(myNetwork.get(key).size()-1));
                 Vector<String> prevQs = new Vector<>();
                 for (int i = 0; i < myNetwork.get(key).size()-1; i++) {
                     prevQs.add(myNetwork.get(key).get(i));
@@ -75,7 +75,8 @@ public class Controller {
             if(!Network.stop){
                 history.addMemento(new NetworkMemento(Network));
             }
-            Network = new network();
+            Network.stop(); 
+            Network.clear();
   
             return "clear successfully!";
         } catch (Exception e) {
@@ -87,8 +88,11 @@ public class Controller {
     @PostMapping("/stop")
     public String stop(@RequestBody String requestBody)  {
         try {
-            history.addMemento(new NetworkMemento(Network));
+            if(!Network.stop){
+                history.addMemento(new NetworkMemento(Network));
+            }
             Network.stop(); 
+            Network.clear();
             return "stop successfully!";
         } catch (Exception e) {
             System.out.println("Error in stop!");

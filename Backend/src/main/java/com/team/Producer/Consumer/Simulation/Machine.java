@@ -47,15 +47,17 @@ public class Machine {
 
     
     private void start(Queue prevQueue, network network) {
-        if(!network.stop){
+            System.out.println("Machine started: " + this.name);
             while (!starting.isInterrupted()) {
                 synchronized (object) {
+                    System.out.println("Machine working: " + this.name);
                     try {
+                        System.out.println("prev : " + prevQueue.getQueueName());
                         while (prevQueue.getProducts().isEmpty()) {
                             monitor.notify(this.name, network);
                             object.wait();
                         }
-                    
+                           System.out.println("Machine also working: " + this.name);
                             this.setProduct(prevQueue.dequeue(network));
                             System.out.println("Machine added: " + (product != null));  
                             System.out.println(this.getName() +" "+this.product.getColor() + " " + this.serviceTime);
@@ -74,12 +76,12 @@ public class Machine {
                     this.starting.interrupt();
                 }
             }
-        }
+        
     }
     
         
     private void finish(Queue prevQueue, Queue nextQueue, network network) {
-        if(!network.stop){
+        
             while (!finishing.isInterrupted()) {
                 synchronized (object) {
                     try {
@@ -104,7 +106,7 @@ public class Machine {
                     this.finishing.interrupt();
                 }
             }
-        }
+        
     }
         private void sendUpdate(String type, String machineId, String flashColor) {
         try {
