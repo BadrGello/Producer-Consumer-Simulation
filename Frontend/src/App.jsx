@@ -16,8 +16,8 @@ const CustomNode = ({ data }) => (
     {/* Handle is the points that connect nodes together */}
     
     <Handle
-      type="target"
-      position="right"
+      type="source"
+      position="left"
       style={{ background: '#555' }}
     />
 
@@ -52,10 +52,9 @@ const CustomNode = ({ data }) => (
         Time: {data.serveTime}
      </div>
     } 
-
     <Handle
-      type="source"
-      position="left"
+      type="target"
+      position="right"
       style={{ background: '#555' }}
     />
   </div>
@@ -136,21 +135,37 @@ const App = () => {
 
   // Save the states for replay
   const [initialState, setInitialState] = useState({ nodes: [], edges: [] });
-
   const serializeGraph = () => {
     const graph = {};
-
+  
     nodes.forEach((node) => {
-      const connections = edges
+      let targetQ = null;
+      let connections = edges
         .filter((edge) => edge.source === node.id || edge.target === node.id)
         .map((edge) => (edge.source === node.id ? edge.target : edge.source));
-
+  
+      if (node.id.startsWith('M')) {
+        
+        edges.forEach((edge) => {
+          if (node.id === edge.source) {
+            targetQ = edge.target; // Capture the target Q
+          }
+        });
+  
+        if (targetQ) {
+          // Remove targetQ first
+          connections = connections.filter(conn => conn !== targetQ);
+          // Append targetQ to the end
+          connections.push(targetQ);
+        }
+      }
+  
       graph[node.id] = connections;
     });
-
+  
     return graph;
   };
-
+  
   const startSimulation = async () => {
     setInitialState({ nodes, edges });
 
@@ -171,6 +186,7 @@ const App = () => {
       console.log(result);
     } catch (error) {
       console.error('Error starting simulation:', error);
+      alert('Error starting simulation')
     }
 
     setIsDisabled(true);
@@ -197,6 +213,7 @@ const App = () => {
 
     } catch (error) {
       console.error('Error in replay simulation:', error);
+      alert('Error in replay simulation')
     }
 
     // Send to backend
@@ -219,7 +236,8 @@ const App = () => {
       const result = await response.text();
       console.log(result);
     } catch (error) {
-      console.error('Error in clear simulation:', error);
+      console.error('Error in stop simulation:', error);
+      alert('Error in stop simulation')
     }
 
     setIsDisabled(false);
@@ -246,6 +264,7 @@ const App = () => {
       console.log(result);
     } catch (error) {
       console.error('Error in clear simulation:', error);
+      alert('Error in clear simulation')
     }
 
     
