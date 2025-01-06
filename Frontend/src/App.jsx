@@ -179,7 +179,7 @@ const App = () => {
 
   
   const replaySimulation = async () => {
-    stopSimulation();
+   // stopSimulation();
     
     setNodes(initialState.nodes);
     setEdges(initialState.edges);
@@ -208,7 +208,7 @@ const App = () => {
   const stopSimulation = async () => {
 
     try {
-      const response = await fetch('http://localhost:8080/clear', {
+      const response = await fetch('http://localhost:8080/stop', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -233,7 +233,22 @@ const App = () => {
     setQueueCount(0)
     setMachineCount(0)
 
-    stopSimulation()
+    try {
+      const response = await fetch('http://localhost:8080/clear', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ }),
+      });
+
+      const result = await response.text();
+      console.log(result);
+    } catch (error) {
+      console.error('Error in clear simulation:', error);
+    }
+
+    
 
     setIsDisabled(false);
     setLocked(false)

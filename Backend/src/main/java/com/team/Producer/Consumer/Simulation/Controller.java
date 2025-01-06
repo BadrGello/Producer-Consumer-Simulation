@@ -72,8 +72,9 @@ public class Controller {
     @PostMapping("/clear")
     public String clear(@RequestBody String requestBody)  {
         try {
-            history.addMemento(new NetworkMemento(Network));
-            Network.stop();
+            if(!Network.stop){
+                history.addMemento(new NetworkMemento(Network));
+            }
             Network = new network();
   
             return "clear successfully!";
@@ -82,6 +83,19 @@ public class Controller {
             return "error in clear!";       
         }
     }   
+
+    @PostMapping("/stop")
+    public String stop(@RequestBody String requestBody)  {
+        try {
+            history.addMemento(new NetworkMemento(Network));
+            Network.stop(); 
+            return "stop successfully!";
+        } catch (Exception e) {
+            System.out.println("Error in stop!");
+            return "error in stop!";       
+        }
+    }  
+
     @PostMapping("/replay")
     public String replay(@RequestBody String requestBody)  {
         try {
