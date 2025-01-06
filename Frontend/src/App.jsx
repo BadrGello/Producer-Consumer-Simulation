@@ -28,7 +28,7 @@ const CustomNode = ({ data }) => (
       <div
         style={{
           position: 'absolute',
-          top: '-20px', // Position the count above the node
+          top: '-30px', // Position the count above the node
           left: '50%',
           transform: 'translateX(-50%)',
           fontSize: '12px', // Adjust font size
