@@ -133,6 +133,28 @@ const App = () => {
     setMachineCount((prev) => prev + 1);
   };
 
+  const resetNodes = () => {
+    setNodes((nds) => 
+      nds.map((node) => {
+        if (node.id.startsWith('Q')) {
+          // Reset count for Q nodes
+          return {
+            ...node,
+            data: { ...node.data, count: 0 }
+          };
+        } else if (node.id.startsWith('M')) {
+          // Reset serveTime for M nodes
+          return {
+            ...node,
+            data: { ...node.data, serveTime: 0 }
+          };
+        }
+        return node;
+      })
+    );
+  };
+  
+
   // Save the states for replay
   const [initialState, setInitialState] = useState({ nodes: [], edges: [] });
   const serializeGraph = () => {
@@ -168,6 +190,7 @@ const App = () => {
   
   const startSimulation = async () => {
     setInitialState({ nodes, edges });
+    resetNodes();
 
     const graph = serializeGraph();
 
@@ -196,10 +219,11 @@ const App = () => {
   
   const replaySimulation = async () => {
    // stopSimulation();
-    
     setNodes(initialState.nodes);
     setEdges(initialState.edges);
 
+    resetNodes();
+    
     try {
       const response = await fetch('http://localhost:8080/replay', {
         method: 'POST',
