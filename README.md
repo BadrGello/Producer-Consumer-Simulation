@@ -1,4 +1,4 @@
-# ⚙️ Simulation Application (For Programming 2 [223 CSE] Course)
+# ⚙️ Producer Consumer Simulation Application (For Programming 2 [223 CSE] Course)
 
 A simulation-based application built using **Spring Boot** for the backend and **React.js** for the frontend. The system allows users to create and visualize **queues, machines, and product flow** while simulating real-time processes.
 
