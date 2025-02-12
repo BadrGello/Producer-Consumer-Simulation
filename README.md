@@ -44,7 +44,7 @@ Utilized in `Machine` and `Input` classes to manage **parallel processing** usin
 ![image](https://github.com/user-attachments/assets/edd7ddb8-bf97-42b7-b267-c293b5105883)
 
 ## 📘 Contributors
-- Badr Elsayed - 22010664
-- Adham Anas - 22010601
-- Nour Khaled Mohamed - 22011319
-- Ali El-Deen Maher - 22010934
+- Badr Elsayed
+- Adham Anas
+- Nour Khaled Mohamed
+- Ali El-Deen Maher
